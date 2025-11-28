@@ -35,11 +35,11 @@ class CatApiService {
     }
   }
 
-  Future <List<Breed>> getBreeds() async {
+  Future<List<Breed>> getBreeds() async {
     try {
       final response = await http.get(
-          Uri.parse('$_baseUrl/breeds'),
-          headers: _apiKey?.isNotEmpty == true ? {'x-api-key': _apiKey!} : {},
+        Uri.parse('$_baseUrl/breeds'),
+        headers: _apiKey?.isNotEmpty == true ? {'x-api-key': _apiKey!} : {},
       );
 
       if (response.statusCode == 200) {
