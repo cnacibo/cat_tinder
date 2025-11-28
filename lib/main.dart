@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'screens/home_screen.dart';
 
 void main() {
   runApp(const CatTinder());
@@ -58,7 +59,7 @@ class _MainTabScreenState extends State<MainTabScreen> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    const BreedsScreen(),
+    // const BreedsScreen(),
   ];
 
   @override
@@ -69,7 +70,7 @@ class _MainTabScreenState extends State<MainTabScreen> {
       //   title: Text(widget.title),
       // ),
       body: _screens[_currentIndex],
-      
+
     );
   }
 }
