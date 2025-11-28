@@ -1,0 +1,27 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  strong-mode:
+    implicit-casts: false
+    implicit-dynamic: false
+
+linter:
+  rules:
+  - always_declare_return_types
+  - always_require_non_null_named_parameters
+  - annotate_overrides
+  - avoid_init_to_null
+  - avoid_return_types_on_setters
+  - avoid_unused_constructor_parameters
+  - await_only_futures
+  - camel_case_types
+  - constant_identifier_names
+  - empty_constructor_bodies
+  - library_names
+  - library_prefixes
+  - no_duplicate_case_values
+  - null_closures
+  - prefer_initializing_formals
+  - prefer_single_quotes
+  - unnecessary_brace_in_string_interps
+  - unnecessary_getters_setters
