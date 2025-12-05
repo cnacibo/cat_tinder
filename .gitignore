@@ -33,11 +33,4 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-.metadata
-android/
-ios/
-linux/
-macos/
-windows/
-web/
 .env
