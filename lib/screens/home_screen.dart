@@ -116,17 +116,27 @@ class _HomeScreenState extends State<HomeScreen> {
               duration: const Duration(milliseconds: 400),
               switchInCurve: Curves.easeIn,
               switchOutCurve: Curves.easeOut,
-              child: Card(
-                key: cardKey,
-                elevation: 8,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Stack(
-                  children: [
-                    _buildCatImage(catImage),
-                    _buildBreedNameOverlay(catImage),
-                  ],
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => CatDetailsScreen(cat: catImage),
+                    ),
+                  );
+                },
+                child: Card(
+                  key: cardKey,
+                  elevation: 8,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Stack(
+                    children: [
+                      _buildCatImage(catImage),
+                      _buildBreedNameOverlay(catImage),
+                    ],
+                  ),
                 ),
               ),
             ),
