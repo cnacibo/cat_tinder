@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'services/cat_api_service.dart';
+import 'screens/breeds_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,25 +55,24 @@ class MainTabScreen extends StatefulWidget {
 class _MainTabScreenState extends State<MainTabScreen> {
   int _currentIndex = 0;
 
-  void _incrementCounter() {
-    setState(() {
-      _currentIndex++;
-    });
-  }
-
-  final List<Widget> _screens = [
-    const HomeScreen(),
-    // const BreedsScreen(),
-  ];
+  final List<Widget> _screens = [const HomeScreen(), const BreedsScreen()];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      //   title: Text(widget.title),
-      // ),
       body: _screens[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        selectedItemColor: Colors.deepPurple,
+        unselectedItemColor: Colors.grey,
+        onTap: (i) {
+          setState(() => _currentIndex = i);
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.pets), label: 'Cats'),
+          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Breeds'),
+        ],
+      ),
     );
   }
 }
