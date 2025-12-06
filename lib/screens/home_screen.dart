@@ -89,23 +89,50 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildCatCard(CatImage catImage) {
     final cardKey = ValueKey(catImage.id ?? catImage.url);
 
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 400),
-      switchInCurve: Curves.easeIn,
-      switchOutCurve: Curves.easeOut,
-      child: Card(
-        key: cardKey,
-        elevation: 8,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Stack(
-          children: [
-            _buildCatImage(catImage),
-            _buildBreedNameOverlay(catImage),
-          ],
-        ),
-      ),
+    double _dragX = 0.0;
+
+    return StatefulBuilder(
+      builder: (context, setLocalState) {
+        return GestureDetector(
+          onHorizontalDragUpdate: (details) {
+            setLocalState(() {
+              _dragX += details.delta.dx;
+            });
+          },
+          onHorizontalDragEnd: (details) {
+            if (_dragX > 120) {
+              _handleSwipe(true);
+            } else if (_dragX < -120) {
+              _handleSwipe(false);
+            }
+            setLocalState(() {
+              _dragX = 0;
+            });
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            transform: Matrix4.identity()..translate(_dragX),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 400),
+              switchInCurve: Curves.easeIn,
+              switchOutCurve: Curves.easeOut,
+              child: Card(
+                key: cardKey,
+                elevation: 8,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Stack(
+                  children: [
+                    _buildCatImage(catImage),
+                    _buildBreedNameOverlay(catImage),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
