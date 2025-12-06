@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../services/cat_api_service.dart';
 import '../models/cat_image.dart';
+import './cat_details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,6 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<CatImage>? _catFuture;
   int _likesCount = 0;
   String? _error;
+  String? _currentCatImageUrl;
 
   @override
   void initState() {
@@ -26,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _error = null;
       _catFuture = _catApiService.getRandomCatImage();
+      _currentCatImageUrl = _generateCatUrl();
     });
     try {
       await _catFuture;
@@ -121,7 +124,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => CatDetailsScreen(cat: catImage),
+                      builder: (_) => CatDetailsScreen(
+                        breed: catImage.breeds.first,
+                        catImageUrl: _currentCatImageUrl ?? _generateCatUrl(),
+                      ),
                     ),
                   );
                 },
@@ -153,8 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
         width: 700,
         height: 700,
         child: CachedNetworkImage(
-          imageUrl:
-              'https://cataas.com/cat?type=square&timestamp=${DateTime.now().millisecondsSinceEpoch}',
+          imageUrl: _currentCatImageUrl ?? _generateCatUrl(),
           fit: BoxFit.cover,
           placeholder: (context, url) => Container(
             color: Colors.black.withOpacity(0.05),
@@ -187,6 +192,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+  String _generateCatUrl() {
+    return 'https://cataas.com/cat?type=square&timestamp=${DateTime.now().millisecondsSinceEpoch}';
   }
 
   Widget _buildBreedNameOverlay(CatImage catImage) {
