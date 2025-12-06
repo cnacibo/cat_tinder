@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'screens/home_screen.dart';
+import 'services/cat_api_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await CatApiService.initialize();
   runApp(const CatTinder());
 }
 
@@ -58,7 +62,7 @@ class _MainTabScreenState extends State<MainTabScreen> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    const BreedsScreen(),
+    // const BreedsScreen(),
   ];
 
   @override
@@ -69,7 +73,6 @@ class _MainTabScreenState extends State<MainTabScreen> {
       //   title: Text(widget.title),
       // ),
       body: _screens[_currentIndex],
-      
     );
   }
 }
