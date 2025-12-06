@@ -4,7 +4,7 @@ import 'services/cat_api_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await CatApiService.initialize(); 
+  await CatApiService.initialize();
   runApp(const CatTinder());
 }
 
@@ -73,7 +73,6 @@ class _MainTabScreenState extends State<MainTabScreen> {
       //   title: Text(widget.title),
       // ),
       body: _screens[_currentIndex],
-
     );
   }
 }

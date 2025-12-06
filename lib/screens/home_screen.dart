@@ -153,7 +153,8 @@ class _HomeScreenState extends State<HomeScreen> {
         width: 700,
         height: 700,
         child: CachedNetworkImage(
-          imageUrl: 'https://cataas.com/cat?type=square&timestamp=${DateTime.now().millisecondsSinceEpoch}',
+          imageUrl:
+              'https://cataas.com/cat?type=square&timestamp=${DateTime.now().millisecondsSinceEpoch}',
           fit: BoxFit.cover,
           placeholder: (context, url) => Container(
             color: Colors.black.withOpacity(0.05),
@@ -178,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ElevatedButton(
                     onPressed: _loadRandomCat,
                     child: const Text('Попробовать снова'),
-                  )
+                  ),
                 ],
               ),
             );
@@ -203,10 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
           gradient: LinearGradient(
             begin: Alignment.bottomCenter,
             end: Alignment.topCenter,
-            colors: [
-              Colors.black.withOpacity(0.75),
-              Colors.transparent,
-            ],
+            colors: [Colors.black.withOpacity(0.75), Colors.transparent],
           ),
           borderRadius: const BorderRadius.only(
             bottomLeft: Radius.circular(20),
@@ -220,7 +218,11 @@ class _HomeScreenState extends State<HomeScreen> {
             fontSize: 22,
             fontWeight: FontWeight.bold,
             shadows: [
-              Shadow(blurRadius: 4, color: Colors.black45, offset: Offset(0, 1))
+              Shadow(
+                blurRadius: 4,
+                color: Colors.black45,
+                offset: Offset(0, 1),
+              ),
             ],
           ),
           textAlign: TextAlign.center,
@@ -268,11 +270,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-        child: Icon(
-          icon,
-          color: Colors.white,
-          size: 30,
-        ),
+        child: Icon(icon, color: Colors.white, size: 30),
       ),
     );
   }
@@ -284,10 +282,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           const Icon(Icons.favorite, color: Colors.red),
           const SizedBox(width: 4),
-          Text(
-            '$_likesCount',
-            style: const TextStyle(fontSize: 18),
-          ),
+          Text('$_likesCount', style: const TextStyle(fontSize: 18)),
         ],
       ),
     );

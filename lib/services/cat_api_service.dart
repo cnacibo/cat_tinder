@@ -29,7 +29,7 @@ class CatApiService {
         throw Exception(
           'Failed to load cat image: ${response.statusCode}\n'
           'Response: ${response.body}\n'
-          'URL: $_baseUrl/images/search?has_breeds=1'
+          'URL: $_baseUrl/images/search?has_breeds=1',
         );
       }
     } catch (e) {
