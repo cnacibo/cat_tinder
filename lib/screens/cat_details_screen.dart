@@ -14,16 +14,12 @@ class CatDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(breed.name),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: Text(breed.name), centerTitle: true),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: CachedNetworkImage(
@@ -85,17 +81,9 @@ class CatDetailsScreen extends StatelessWidget {
         children: [
           Text(
             '$title: ',
-            style: const TextStyle(
-              fontWeight: FontWeight.bold, 
-              fontSize: 18,
-            ),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 18),
-            ),
-          )
+          Expanded(child: Text(value, style: const TextStyle(fontSize: 18))),
         ],
       ),
     );
@@ -109,10 +97,7 @@ class CatDetailsScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '$title ($value/5)',
-            style: const TextStyle(fontSize: 18),
-          ),
+          Text('$title ($value/5)', style: const TextStyle(fontSize: 18)),
           const SizedBox(height: 4),
           LinearProgressIndicator(
             value: value / 5,

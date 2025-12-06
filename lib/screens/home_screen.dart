@@ -124,7 +124,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => CatDetailsScreen(breed: catImage.breeds.first,catImageUrl: _currentCatImageUrl ?? _generateCatUrl()),
+                      builder: (_) => CatDetailsScreen(
+                        breed: catImage.breeds.first,
+                        catImageUrl: _currentCatImageUrl ?? _generateCatUrl(),
+                      ),
                     ),
                   );
                 },
