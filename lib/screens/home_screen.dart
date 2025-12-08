@@ -155,41 +155,48 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildCatImage(CatImage catImage) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
-      child: SizedBox(
-        width: 700,
-        height: 700,
-        child: CachedNetworkImage(
-          imageUrl: _currentCatImageUrl ?? _generateCatUrl(),
-          fit: BoxFit.cover,
-          placeholder: (context, url) => Container(
-            color: Colors.black.withOpacity(0.05),
-            alignment: Alignment.center,
-            child: const SizedBox(
-              width: 48,
-              height: 48,
-              child: CircularProgressIndicator(),
-            ),
-          ),
-          errorWidget: (context, error, stackTrace) {
-            return Container(
-              alignment: Alignment.center,
-              color: Colors.black.withOpacity(0.1),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.broken_image, size: 48, color: Colors.red),
-                  const SizedBox(height: 8),
-                  const Text('Error while loading the image'),
-                  const SizedBox(height: 8),
-                  ElevatedButton(
-                    onPressed: _loadRandomCat,
-                    child: const Text('Try again'),
-                  ),
-                ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final double maxWidth = constraints.maxWidth * 0.9;
+          final double imageSize = maxWidth;
+          
+          return SizedBox(
+            width: imageSize,
+            height: imageSize,
+            child: CachedNetworkImage(
+              imageUrl: _currentCatImageUrl ?? _generateCatUrl(),
+              fit: BoxFit.cover,
+              placeholder: (context, url) => Container(
+                color: Colors.black.withOpacity(0.05),
+                alignment: Alignment.center,
+                child: const SizedBox(
+                  width: 48,
+                  height: 48,
+                  child: CircularProgressIndicator(),
+                ),
               ),
-            );
-          },
-        ),
+              errorWidget: (context, error, stackTrace) {
+                return Container(
+                  alignment: Alignment.center,
+                  color: Colors.black.withOpacity(0.1),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.broken_image, size: 48, color: Colors.red),
+                      const SizedBox(height: 8),
+                      const Text('Error while loading the image...'),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: _loadRandomCat,
+                        child: const Text('Try again!'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          );
+        },
       ),
     );
   }
