@@ -37,34 +37,34 @@ class CatDetailsScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             Text(
-              breed.description ?? 'Нет описания 😿',
+              breed.description ?? 'No description 😿',
               style: const TextStyle(fontSize: 18),
             ),
 
             const SizedBox(height: 20),
 
-            _infoRow('Страна происхождения', breed.origin ?? 'Неизвестно'),
-            _infoRow('Характер', breed.temperament ?? 'Неизвестно'),
-            _infoRow('Продолжительность жизни', '${breed.lifeSpan} лет'),
+            _infoRow('Origin Country', breed.origin ?? 'No data'),
+            _infoRow('Temperament', breed.temperament ?? 'No data'),
+            _infoRow('LifeSpan', '${breed.lifeSpan} years'),
 
             const SizedBox(height: 20),
 
-            _infoRow('Вес (кг)', breed.weight['metric'] ?? '—'),
-            _infoRow('Вес (фунты)', breed.weight['imperial'] ?? '—'),
+            _infoRow('Weight (metric)', breed.weight['metric'] ?? '—'),
+            _infoRow('Weight (imperial)', breed.weight['imperial'] ?? '—'),
 
             const SizedBox(height: 30),
 
-            _rating('Привязанность', breed.affectionLevel),
-            _rating('Интеллект', breed.intelligence),
-            _rating('Энергичность', breed.energyLevel),
-            _rating('Дружелюбность к детям', breed.childFriendly),
-            _rating('Дружелюбность к собакам', breed.dogFriendly),
-            _rating('Дружелюбность к незнакомцам', breed.strangerFriendly),
-            _rating('Коммуникабельность', breed.socialNeeds),
-            _rating('Здоровье', breed.healthIssues),
-            _rating('Линька', breed.sheddingLevel),
-            _rating('Уход', breed.grooming),
-            _rating('Говорливость', breed.vocalisation),
+            _rating('Affection Level', breed.affectionLevel),
+            _rating('Intelligence', breed.intelligence),
+            _rating('Energy Level', breed.energyLevel),
+            _rating('Child Friendly', breed.childFriendly),
+            _rating('Dog Friendly', breed.dogFriendly),
+            _rating('Stranger Friendly', breed.strangerFriendly),
+            _rating('Social Needs', breed.socialNeeds),
+            _rating('Health Issues', breed.healthIssues),
+            _rating('Shedding Level', breed.sheddingLevel),
+            _rating('Grooming', breed.grooming),
+            _rating('Vocalisation', breed.vocalisation),
 
             const SizedBox(height: 30),
           ],

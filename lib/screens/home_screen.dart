@@ -51,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Ошибка'),
+        title: const Text('Error'),
         content: Text(message),
         actions: [
           TextButton(
@@ -59,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.of(context).pop();
               _loadRandomCat();
             },
-            child: const Text('Попробовать загрузить снова'),
+            child: const Text('Try again'),
           ),
         ],
       ),
@@ -74,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const Icon(Icons.error_outline, size: 64, color: Colors.red),
           const SizedBox(height: 16),
           Text(
-            'Ошибка загрузки',
+            'Error while loading',
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 8),
@@ -82,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: _loadRandomCat,
-            child: const Text('Попробовать снова'),
+            child: const Text('Try again'),
           ),
         ],
       ),
@@ -179,11 +179,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   const Icon(Icons.broken_image, size: 48, color: Colors.red),
                   const SizedBox(height: 8),
-                  const Text('Ошибка загрузки изображения'),
+                  const Text('Error while loading the image'),
                   const SizedBox(height: 8),
                   ElevatedButton(
                     onPressed: _loadRandomCat,
-                    child: const Text('Попробовать снова'),
+                    child: const Text('Try again'),
                   ),
                 ],
               ),
@@ -246,12 +246,12 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         _buildActionButton(
           icon: Icons.close,
-          color: Colors.red,
+          color: Color(0xFFBF0603),
           onTap: () => _handleSwipe(false),
         ),
         _buildActionButton(
           icon: Icons.favorite,
-          color: Colors.green,
+          color: Color(0xFF386641),
           onTap: () => _handleSwipe(true),
         ),
       ],
@@ -269,17 +269,21 @@ class _HomeScreenState extends State<HomeScreen> {
         width: 70,
         height: 70,
         decoration: BoxDecoration(
-          color: color,
+          color: Theme.of(context).colorScheme.surface, 
           shape: BoxShape.circle,
+          border: Border.all(
+            color: color, 
+            width: 3,
+          ),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.3),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
+              color: color.withOpacity(0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
-        child: Icon(icon, color: Colors.white, size: 30),
+        child: Icon(icon, color: color, size: 30), 
       ),
     );
   }
@@ -289,9 +293,9 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.only(right: 16.0),
       child: Row(
         children: [
-          const Icon(Icons.favorite, color: Colors.red),
+          const Icon(Icons.favorite_border, color: Colors.white),
           const SizedBox(width: 4),
-          Text('$_likesCount', style: const TextStyle(fontSize: 18)),
+          Text('$_likesCount', style: TextStyle(fontSize: 18, color: Theme.of(context).colorScheme.onPrimary)),
         ],
       ),
     );
@@ -315,8 +319,13 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Кототиндер'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: Text(
+          'Cat Tinder',
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onPrimary, 
+          ),
+        ),
         centerTitle: true,
         actions: [_buildLikesCounter()],
       ),
@@ -328,11 +337,11 @@ class _HomeScreenState extends State<HomeScreen> {
           }
 
           if (snapshot.hasError) {
-            return _buildErrorWidget(snapshot.error ?? 'Неизвестная ошибка');
+            return _buildErrorWidget(snapshot.error ?? 'Unknown error');
           }
 
           if (!snapshot.hasData) {
-            return const Center(child: Text('Нет данных о котике'));
+            return const Center(child: Text('No data for this cat'));
           }
 
           return _buildMainContent(snapshot.data!);

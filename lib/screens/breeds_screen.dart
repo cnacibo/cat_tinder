@@ -36,7 +36,7 @@ class _BreedsScreenState extends State<BreedsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Ошибка'),
+        title: const Text('Error'),
         content: Text(message),
         actions: [
           TextButton(
@@ -44,7 +44,7 @@ class _BreedsScreenState extends State<BreedsScreen> {
               Navigator.of(context).pop();
               _loadBreeds();
             },
-            child: const Text('Попробовать загрузить снова'),
+            child: const Text('Try again'),
           ),
         ],
       ),
@@ -54,7 +54,16 @@ class _BreedsScreenState extends State<BreedsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Список пород"), centerTitle: true),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: Text(
+          'Breeds List',
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onPrimary, 
+          ),
+        ), 
+        centerTitle: true
+      ),
       body: FutureBuilder<List<Breed>>(
         future: _breedsFuture,
         builder: (context, snapshot) {
@@ -63,7 +72,7 @@ class _BreedsScreenState extends State<BreedsScreen> {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text("Ошибка: ${snapshot.error}"));
+            return Center(child: Text("Error: ${snapshot.error}"));
           }
 
           final breeds = snapshot.data ?? [];
@@ -77,7 +86,7 @@ class _BreedsScreenState extends State<BreedsScreen> {
               return ListTile(
                 title: Text(breed.name),
                 subtitle: Text(
-                  breed.temperament ?? 'Без данных',
+                  breed.temperament ?? 'No data',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -91,12 +100,12 @@ class _BreedsScreenState extends State<BreedsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(breed.description ?? "Нет описания 😿"),
+                            Text(breed.description ?? "No description 😿"),
                             const SizedBox(height: 16),
-                            Text("Страна: ${breed.origin ?? "?"}"),
-                            Text("Характер: ${breed.temperament ?? "?"}"),
-                            Text("Жизнь: ${breed.lifeSpan ?? "?"} лет"),
-                            Text("Интеллект: ${breed.intelligence ?? "?"}/5"),
+                            Text("Origin Country: ${breed.origin ?? "?"}"),
+                            Text("Temperament: ${breed.temperament ?? "?"}"),
+                            Text("LifeSpan: ${breed.lifeSpan ?? "?"} years"),
+                            Text("Intelligence: ${breed.intelligence ?? "?"}/5"),
                           ],
                         ),
                       ),

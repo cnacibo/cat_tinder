@@ -14,10 +14,19 @@ class CatTinder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Кототиндер',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+    final myTheme = ThemeData(
+        colorScheme: ColorScheme(
+          brightness: Brightness.light,
+          primary: const Color(0xFF283618),    
+          onPrimary: Colors.white,
+          secondary: const Color(0xFFDDA15E), 
+          onSecondary: Colors.white,
+          error: Colors.red,
+          onError: Colors.white,
+          surface: const Color(0xFFFFFFFF),
+          onSurface: const Color(0xFF283618),
+        ),
+        scaffoldBackgroundColor: Colors.white,
         useMaterial3: true,
         fontFamily: 'Poppins',
         textTheme: const TextTheme(
@@ -37,6 +46,31 @@ class CatTinder extends StatelessWidget {
             color: Colors.black87,
           ),
         ),
+      );
+
+    return MaterialApp(
+      title: 'Cat Tinder',
+      theme: myTheme.copyWith(
+          appBarTheme: AppBarTheme(
+          backgroundColor: myTheme.colorScheme.surface,
+          foregroundColor: myTheme.colorScheme.onSurface,
+          elevation: 2,
+          centerTitle: true,
+        ),
+        navigationBarTheme: NavigationBarThemeData(
+          backgroundColor: myTheme.colorScheme.primary.withOpacity(0.3),
+          indicatorColor: myTheme.colorScheme.primary.withOpacity(0.5),
+          surfaceTintColor: myTheme.colorScheme.primary, 
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            elevation: 4,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+          ),
+        ),
       ),
       home: const MainTabScreen(),
       debugShowCheckedModeBanner: false,
@@ -46,7 +80,6 @@ class CatTinder extends StatelessWidget {
 
 class MainTabScreen extends StatefulWidget {
   const MainTabScreen({super.key});
-  final String title = 'Кототиндер';
 
   @override
   State<MainTabScreen> createState() => _MainTabScreenState();
@@ -61,16 +94,12 @@ class _MainTabScreenState extends State<MainTabScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        selectedItemColor: Colors.deepPurple,
-        unselectedItemColor: Colors.grey,
-        onTap: (i) {
-          setState(() => _currentIndex = i);
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.pets), label: 'Cats'),
-          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Breeds'),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (i) => setState(() => _currentIndex = i),
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.pets), label: 'Cats'),
+          NavigationDestination(icon: Icon(Icons.list), label: 'Breeds'),
         ],
       ),
     );
