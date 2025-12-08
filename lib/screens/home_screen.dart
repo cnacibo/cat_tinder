@@ -15,7 +15,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final CatApiService _catApiService = CatApiService();
   Future<CatImage>? _catFuture;
   int _likesCount = 0;
-  String? _error;
   String? _currentCatImageUrl;
 
   @override
@@ -26,18 +25,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadRandomCat() async {
     setState(() {
-      _error = null;
       _catFuture = _catApiService.getRandomCatImage();
       _currentCatImageUrl = _generateCatUrl();
     });
-    try {
-      await _catFuture;
-    } catch (e) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        setState(() => _error = e.toString());
-        _showErrorDialog(e.toString());
-      });
-    }
   }
 
   void _handleSwipe(bool isRight) {
@@ -47,74 +37,90 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadRandomCat();
   }
 
-  void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Error'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _loadRandomCat();
-            },
-            child: const Text('Try again'),
-          ),
-        ],
+  Widget _buildErrorWidget(Object error) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            const SizedBox(height: 16),
+            Text(
+              'Loading error',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Text(
+                _getUserFriendlyError(error),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.grey[700],
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: _loadRandomCat,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Try again!'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
-
-  Widget _buildErrorWidget(Object error) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.error_outline, size: 64, color: Colors.red),
-          const SizedBox(height: 16),
-          Text(
-            'Error while loading',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: 8),
-          Text(error.toString()),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _loadRandomCat,
-            child: const Text('Try again'),
-          ),
-        ],
-      ),
-    );
+  String _getUserFriendlyError(Object error) {
+    final errorString = error.toString();
+    
+    if (errorString.contains('SocketException') || 
+        errorString.contains('Network is unreachable')) {
+      return 'Check your internet connection!';
+    } else if (errorString.contains('TimeoutException')) {
+      return 'Timeout Exception. Try again later!';
+    } else if (errorString.contains('404')) {
+      return 'The cat is not found 🐱';
+    } else if (errorString.contains('500')) {
+      return 'Something is wrong with the server!';
+    } else if (errorString.contains('No breeds available')) {
+      return 'Breed information is not available!';
+    }
+    
+    return 'Something is wrong. Try again!';
   }
 
   Widget _buildCatCard(CatImage catImage) {
-    final cardKey = ValueKey(catImage.id ?? catImage.url);
+    final cardKey = ValueKey(catImage.id);
 
-    double _dragX = 0.0;
+    double dragX = 0.0;
 
     return StatefulBuilder(
       builder: (context, setLocalState) {
         return GestureDetector(
           onHorizontalDragUpdate: (details) {
             setLocalState(() {
-              _dragX += details.delta.dx;
+              dragX += details.delta.dx;
             });
           },
           onHorizontalDragEnd: (details) {
-            if (_dragX > 120) {
+            if (dragX > 120) {
               _handleSwipe(true);
-            } else if (_dragX < -120) {
+            } else if (dragX < -120) {
               _handleSwipe(false);
             }
             setLocalState(() {
-              _dragX = 0;
+              dragX = 0;
             });
           },
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            transform: Matrix4.identity()..translate(_dragX),
+            transform: Matrix4.identity()..translate(dragX),
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 400),
               switchInCurve: Curves.easeIn,
@@ -347,11 +353,11 @@ class _HomeScreenState extends State<HomeScreen> {
             return _buildErrorWidget(snapshot.error ?? 'Unknown error');
           }
 
-          if (!snapshot.hasData) {
-            return const Center(child: Text('No data for this cat'));
+          if (snapshot.hasData) {
+            return _buildMainContent(snapshot.data!);
           }
 
-          return _buildMainContent(snapshot.data!);
+          return _buildErrorWidget(Exception('No data for this cat!'));
         },
       ),
     );
