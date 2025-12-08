@@ -46,21 +46,16 @@ class CatTinder extends StatelessWidget {
             color: Colors.black87,
           ),
         ),
-      );
-
-    return MaterialApp(
-      title: 'Cat Tinder',
-      theme: myTheme.copyWith(
-          appBarTheme: AppBarTheme(
-          backgroundColor: myTheme.colorScheme.surface,
-          foregroundColor: myTheme.colorScheme.onSurface,
+        appBarTheme: AppBarTheme(
+          backgroundColor: Color(0xFFFFFFFF),
+          foregroundColor: Color(0xFF283618),
           elevation: 2,
           centerTitle: true,
         ),
         navigationBarTheme: NavigationBarThemeData(
-          backgroundColor: myTheme.colorScheme.primary.withOpacity(0.3),
-          indicatorColor: myTheme.colorScheme.primary.withOpacity(0.5),
-          surfaceTintColor: myTheme.colorScheme.primary, 
+          backgroundColor: Color(0xFF283618).withOpacity(0.3),
+          indicatorColor: Color(0xFF283618).withOpacity(0.5),
+          surfaceTintColor: Color(0xFF283618), 
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
@@ -71,7 +66,11 @@ class CatTinder extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
           ),
         ),
-      ),
+      );
+
+    return MaterialApp(
+      title: 'Cat Tinder',
+      theme: myTheme,
       home: const MainTabScreen(),
       debugShowCheckedModeBanner: false,
     );
