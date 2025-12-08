@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../services/cat_api_service.dart';
 import '../models/cat_image.dart';
 import './cat_details_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,6 +22,19 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadRandomCat();
+    _loadSavedLikes();
+  }
+
+  Future<void> _loadSavedLikes() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _likesCount = prefs.getInt('cat_tinder_likes') ?? 0;
+    });
+  }
+
+  Future<void> _saveLikes() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('cat_tinder_likes', _likesCount);
   }
 
   Future<void> _loadRandomCat() async {
@@ -33,8 +47,14 @@ class _HomeScreenState extends State<HomeScreen> {
   void _handleSwipe(bool isRight) {
     if (isRight) {
       setState(() => _likesCount++);
+      _saveLikes();
     }
     _loadRandomCat();
+  }
+
+  void _resetLikes() async {
+    setState(() => _likesCount = 0);
+    _saveLikes();
   }
 
   Widget _buildErrorWidget(Object error) {
@@ -309,6 +329,11 @@ class _HomeScreenState extends State<HomeScreen> {
           const Icon(Icons.favorite_border, color: Colors.white),
           const SizedBox(width: 4),
           Text('$_likesCount', style: TextStyle(fontSize: 18, color: Theme.of(context).colorScheme.onPrimary)),
+          IconButton(
+            icon: const Icon(Icons.restart_alt, size: 18, color: Colors.white70),
+            onPressed: _resetLikes,
+            tooltip: 'Reset counter',
+          ),
         ],
       ),
     );
