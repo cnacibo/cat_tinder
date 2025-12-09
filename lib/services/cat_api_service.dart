@@ -52,7 +52,7 @@ class CatApiService {
           throw Exception('Empty data');
         }
       } else {
-        throw Exception('CatImage');
+        throw Exception('Failed to load breeds: ${response.statusCode}');
       }
     } catch (e) {
       throw Exception('Network error: $e');

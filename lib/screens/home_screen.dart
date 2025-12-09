@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../services/cat_api_service.dart';
 import '../models/cat_image.dart';
 import './cat_details_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,106 +16,131 @@ class _HomeScreenState extends State<HomeScreen> {
   final CatApiService _catApiService = CatApiService();
   Future<CatImage>? _catFuture;
   int _likesCount = 0;
-  String? _error;
   String? _currentCatImageUrl;
 
   @override
   void initState() {
     super.initState();
     _loadRandomCat();
+    _loadSavedLikes();
+  }
+
+  Future<void> _loadSavedLikes() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _likesCount = prefs.getInt('cat_tinder_likes') ?? 0;
+    });
+  }
+
+  Future<void> _saveLikes() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('cat_tinder_likes', _likesCount);
   }
 
   Future<void> _loadRandomCat() async {
     setState(() {
-      _error = null;
       _catFuture = _catApiService.getRandomCatImage();
       _currentCatImageUrl = _generateCatUrl();
     });
-    try {
-      await _catFuture;
-    } catch (e) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        setState(() => _error = e.toString());
-        _showErrorDialog(e.toString());
-      });
-    }
   }
 
   void _handleSwipe(bool isRight) {
     if (isRight) {
       setState(() => _likesCount++);
+      _saveLikes();
     }
     _loadRandomCat();
   }
 
-  void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Ошибка'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _loadRandomCat();
-            },
-            child: const Text('Попробовать загрузить снова'),
-          ),
-        ],
-      ),
-    );
+  void _resetLikes() async {
+    setState(() => _likesCount = 0);
+    _saveLikes();
   }
 
   Widget _buildErrorWidget(Object error) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.error_outline, size: 64, color: Colors.red),
-          const SizedBox(height: 16),
-          Text(
-            'Ошибка загрузки',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: 8),
-          Text(error.toString()),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _loadRandomCat,
-            child: const Text('Попробовать снова'),
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            const SizedBox(height: 16),
+            Text(
+              'Loading error',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Text(
+                _getUserFriendlyError(error),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.grey[700],
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: _loadRandomCat,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Try again!'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+  String _getUserFriendlyError(Object error) {
+    final errorString = error.toString();
+    
+    if (errorString.contains('SocketException') || 
+        errorString.contains('Network is unreachable')) {
+      return 'Check your internet connection!';
+    } else if (errorString.contains('TimeoutException')) {
+      return 'Timeout Exception. Try again later!';
+    } else if (errorString.contains('404')) {
+      return 'The cat is not found 🐱';
+    } else if (errorString.contains('500')) {
+      return 'Something is wrong with the server!';
+    } else if (errorString.contains('No breeds available')) {
+      return 'Breed information is not available!';
+    }
+    
+    return 'Something is wrong. Try again!';
+  }
 
   Widget _buildCatCard(CatImage catImage) {
-    final cardKey = ValueKey(catImage.id ?? catImage.url);
+    final cardKey = ValueKey(catImage.id);
 
-    double _dragX = 0.0;
+    double dragX = 0.0;
 
     return StatefulBuilder(
       builder: (context, setLocalState) {
         return GestureDetector(
           onHorizontalDragUpdate: (details) {
             setLocalState(() {
-              _dragX += details.delta.dx;
+              dragX += details.delta.dx;
             });
           },
           onHorizontalDragEnd: (details) {
-            if (_dragX > 120) {
+            if (dragX > 120) {
               _handleSwipe(true);
-            } else if (_dragX < -120) {
+            } else if (dragX < -120) {
               _handleSwipe(false);
             }
             setLocalState(() {
-              _dragX = 0;
+              dragX = 0;
             });
           },
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            transform: Matrix4.identity()..translate(_dragX),
+            transform: Matrix4.identity()..translate(dragX),
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 400),
               switchInCurve: Curves.easeIn,
@@ -155,41 +181,48 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildCatImage(CatImage catImage) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
-      child: SizedBox(
-        width: 700,
-        height: 700,
-        child: CachedNetworkImage(
-          imageUrl: _currentCatImageUrl ?? _generateCatUrl(),
-          fit: BoxFit.cover,
-          placeholder: (context, url) => Container(
-            color: Colors.black.withOpacity(0.05),
-            alignment: Alignment.center,
-            child: const SizedBox(
-              width: 48,
-              height: 48,
-              child: CircularProgressIndicator(),
-            ),
-          ),
-          errorWidget: (context, error, stackTrace) {
-            return Container(
-              alignment: Alignment.center,
-              color: Colors.black.withOpacity(0.1),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.broken_image, size: 48, color: Colors.red),
-                  const SizedBox(height: 8),
-                  const Text('Ошибка загрузки изображения'),
-                  const SizedBox(height: 8),
-                  ElevatedButton(
-                    onPressed: _loadRandomCat,
-                    child: const Text('Попробовать снова'),
-                  ),
-                ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final double maxWidth = constraints.maxWidth * 0.9;
+          final double imageSize = maxWidth;
+          
+          return SizedBox(
+            width: imageSize,
+            height: imageSize,
+            child: CachedNetworkImage(
+              imageUrl: _currentCatImageUrl ?? _generateCatUrl(),
+              fit: BoxFit.cover,
+              placeholder: (context, url) => Container(
+                color: Colors.black.withOpacity(0.05),
+                alignment: Alignment.center,
+                child: const SizedBox(
+                  width: 48,
+                  height: 48,
+                  child: CircularProgressIndicator(),
+                ),
               ),
-            );
-          },
-        ),
+              errorWidget: (context, error, stackTrace) {
+                return Container(
+                  alignment: Alignment.center,
+                  color: Colors.black.withOpacity(0.1),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.broken_image, size: 48, color: Colors.red),
+                      const SizedBox(height: 8),
+                      const Text('Error while loading the image...'),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: _loadRandomCat,
+                        child: const Text('Try again!'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          );
+        },
       ),
     );
   }
@@ -246,12 +279,12 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         _buildActionButton(
           icon: Icons.close,
-          color: Colors.red,
+          color: Color(0xFFBF0603),
           onTap: () => _handleSwipe(false),
         ),
         _buildActionButton(
           icon: Icons.favorite,
-          color: Colors.green,
+          color: Color(0xFF386641),
           onTap: () => _handleSwipe(true),
         ),
       ],
@@ -269,17 +302,21 @@ class _HomeScreenState extends State<HomeScreen> {
         width: 70,
         height: 70,
         decoration: BoxDecoration(
-          color: color,
+          color: Theme.of(context).colorScheme.surface, 
           shape: BoxShape.circle,
+          border: Border.all(
+            color: color, 
+            width: 3,
+          ),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.3),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
+              color: color.withOpacity(0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
-        child: Icon(icon, color: Colors.white, size: 30),
+        child: Icon(icon, color: color, size: 30), 
       ),
     );
   }
@@ -289,9 +326,14 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.only(right: 16.0),
       child: Row(
         children: [
-          const Icon(Icons.favorite, color: Colors.red),
+          const Icon(Icons.favorite_border, color: Colors.white),
           const SizedBox(width: 4),
-          Text('$_likesCount', style: const TextStyle(fontSize: 18)),
+          Text('$_likesCount', style: TextStyle(fontSize: 18, color: Theme.of(context).colorScheme.onPrimary)),
+          IconButton(
+            icon: const Icon(Icons.restart_alt, size: 18, color: Colors.white70),
+            onPressed: _resetLikes,
+            tooltip: 'Reset counter',
+          ),
         ],
       ),
     );
@@ -315,8 +357,13 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Кототиндер'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: Text(
+          'Cat Tinder',
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onPrimary, 
+          ),
+        ),
         centerTitle: true,
         actions: [_buildLikesCounter()],
       ),
@@ -328,14 +375,14 @@ class _HomeScreenState extends State<HomeScreen> {
           }
 
           if (snapshot.hasError) {
-            return _buildErrorWidget(snapshot.error ?? 'Неизвестная ошибка');
+            return _buildErrorWidget(snapshot.error ?? 'Unknown error');
           }
 
-          if (!snapshot.hasData) {
-            return const Center(child: Text('Нет данных о котике'));
+          if (snapshot.hasData) {
+            return _buildMainContent(snapshot.data!);
           }
 
-          return _buildMainContent(snapshot.data!);
+          return _buildErrorWidget(Exception('No data for this cat!'));
         },
       ),
     );
