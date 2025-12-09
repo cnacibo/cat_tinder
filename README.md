@@ -29,4 +29,5 @@
 ---
 
 ## 📦 Ссылка на скачивание APK
+ [cat_tinder.apk](https://github.com/cnacibo/cat_tinder/releases/download/v1.0.0/app-release.apk)
 
